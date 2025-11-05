@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { useSupport } from '@/contexts/SupportContext';
-import { Message, SupportTicket } from '@/types';
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSupport } from "@/contexts/SupportContext";
+import { Message, SupportTicket } from "@/types";
 import {
   LogOut,
   Send,
@@ -14,15 +14,14 @@ import {
   Clock,
   ArrowUp,
   ArrowDown,
-  FileText,
   User,
   Search,
   Filter,
   Menu,
   X,
   ChevronDown,
-} from 'lucide-react';
-import { ModeToggle } from '@/components/theme-toggle';
+} from "lucide-react";
+import { ModeToggle } from "@/components/theme-toggle";
 
 export default function SupportDashboardPage() {
   const router = useRouter();
@@ -34,24 +33,22 @@ export default function SupportDashboardPage() {
     sendAgentMessage,
     updateTicketStatus,
     updateTicketPriority,
-    addAgentNote,
   } = useSupport();
-  const [input, setInput] = useState('');
-  const [noteInput, setNoteInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [input, setInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    if (!user || user.role !== 'agent') {
-      router.push('/');
+    if (!user || user.role !== "agent") {
+      router.push("/");
     }
   }, [user, router]);
 
@@ -73,36 +70,36 @@ export default function SupportDashboardPage() {
   const handleSend = () => {
     if (!input.trim() || !selectedTicket) return;
     sendAgentMessage(input);
-    setInput('');
+    setInput("");
   };
 
-  const getPriorityColor = (priority: SupportTicket['priority']) => {
+  const getPriorityColor = (priority: SupportTicket["priority"]) => {
     switch (priority) {
-      case 'urgent':
-        return 'bg-red-500';
-      case 'high':
-        return 'bg-orange-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'low':
-        return 'bg-green-500';
+      case "urgent":
+        return "bg-red-500";
+      case "high":
+        return "bg-orange-500";
+      case "medium":
+        return "bg-yellow-500";
+      case "low":
+        return "bg-green-500";
       default:
-        return 'bg-gray-500';
+        return "bg-gray-500";
     }
   };
 
-  const getStatusColor = (status: SupportTicket['status']) => {
+  const getStatusColor = (status: SupportTicket["status"]) => {
     switch (status) {
-      case 'open':
-        return 'bg-blue-500';
-      case 'in-progress':
-        return 'bg-yellow-500';
-      case 'resolved':
-        return 'bg-green-500';
-      case 'escalated':
-        return 'bg-red-500';
+      case "open":
+        return "bg-blue-500";
+      case "in-progress":
+        return "bg-yellow-500";
+      case "resolved":
+        return "bg-green-500";
+      case "escalated":
+        return "bg-red-500";
       default:
-        return 'bg-gray-500';
+        return "bg-gray-500";
     }
   };
 
@@ -110,23 +107,26 @@ export default function SupportDashboardPage() {
     const matchesSearch =
       ticket.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticket.customerPhone.includes(searchQuery);
-    const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || ticket.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const quickReplies = [
-    'Hello! How can I assist you today?',
-    'Thank you for contacting KRUX Finance.',
-    'I understand your concern. Let me help you with that.',
-    'Please provide more details so I can assist you better.',
-    'I have resolved your query. Is there anything else?',
+    "Hello! How can I assist you today?",
+    "Thank you for contacting KRUX Finance.",
+    "I understand your concern. Let me help you with that.",
+    "Please provide more details so I can assist you better.",
+    "I have resolved your query. Is there anything else?",
   ];
 
   if (!user) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Access Denied</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+            Access Denied
+          </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             You do not have permission to view this page.
           </p>
@@ -141,22 +141,24 @@ export default function SupportDashboardPage() {
         <div className="flex h-full w-full relative">
           {/* Mobile Overlay */}
           {isLeftPanelOpen && (
-            <div 
-              className="fixed inset-0 bg-black/50 z-30 lg:hidden" 
+            <div
+              className="fixed inset-0 bg-black/50 z-30 lg:hidden"
               onClick={() => setIsLeftPanelOpen(false)}
             />
           )}
-          
+
           {/* Left Panel - Ticket Queue */}
           <div
             className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] md:w-[350px] lg:w-[380px] xl:w-[400px] bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 flex flex-col z-40 lg:relative lg:z-auto transition-transform duration-300 ease-in-out ${
-              isLeftPanelOpen ? 'translate-x-0' : '-translate-x-full'
+              isLeftPanelOpen ? "translate-x-0" : "-translate-x-full"
             }`}
           >
             {/* Header */}
             <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Support</h1>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                  Support
+                </h1>
                 <div className="flex items-center gap-2">
                   <ModeToggle />
                   <motion.button
@@ -164,7 +166,7 @@ export default function SupportDashboardPage() {
                     whileTap={{ scale: 0.9 }}
                     onClick={() => {
                       logout();
-                      router.push('/');
+                      router.push("/");
                     }}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   >
@@ -226,8 +228,8 @@ export default function SupportDashboardPage() {
                     }}
                     className={`p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer transition-colors ${
                       selectedTicket?.id === ticket.id
-                        ? 'bg-indigo-100 dark:bg-indigo-900/30 border-l-4 border-l-indigo-500'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? "bg-indigo-100 dark:bg-indigo-900/30 border-l-4 border-l-indigo-500"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
                     }`}
                   >
                     <div className="flex items-start justify-between mb-1 sm:mb-2">
@@ -240,7 +242,9 @@ export default function SupportDashboardPage() {
                         </p>
                       </div>
                       <div
-                        className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0 ${getPriorityColor(ticket.priority)}`}
+                        className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0 ${getPriorityColor(
+                          ticket.priority
+                        )}`}
                       />
                     </div>
                     <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap">
@@ -256,7 +260,8 @@ export default function SupportDashboardPage() {
                       </span>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 break-words">
-                      {ticket.messages[ticket.messages.length - 1]?.text || 'No messages'}
+                      {ticket.messages[ticket.messages.length - 1]?.text ||
+                        "No messages"}
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                       {new Date(ticket.updatedAt).toLocaleString()}
@@ -300,10 +305,14 @@ export default function SupportDashboardPage() {
                       <div className="relative">
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => setIsPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                          onClick={() =>
+                            setIsPriorityDropdownOpen(!isPriorityDropdownOpen)
+                          }
                           className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none"
                         >
-                          <span className="capitalize text-xs sm:text-sm md:text-base">{selectedTicket.priority}</span>
+                          <span className="capitalize text-xs sm:text-sm md:text-base">
+                            {selectedTicket.priority}
+                          </span>
                           <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                         </motion.button>
                         <AnimatePresence>
@@ -314,13 +323,13 @@ export default function SupportDashboardPage() {
                               exit={{ opacity: 0, y: -10 }}
                               className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10"
                             >
-                              {['low', 'medium', 'high', 'urgent'].map((p) => (
+                              {["low", "medium", "high", "urgent"].map((p) => (
                                 <button
                                   key={p}
                                   onClick={() => {
                                     updateTicketPriority(
                                       selectedTicket.id,
-                                      p as SupportTicket['priority']
+                                      p as SupportTicket["priority"]
                                     );
                                     setIsPriorityDropdownOpen(false);
                                   }}
@@ -338,10 +347,14 @@ export default function SupportDashboardPage() {
                       <div className="relative">
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                          onClick={() =>
+                            setIsStatusDropdownOpen(!isStatusDropdownOpen)
+                          }
                           className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none"
                         >
-                          <span className="capitalize text-xs sm:text-sm md:text-base">{selectedTicket.status}</span>
+                          <span className="capitalize text-xs sm:text-sm md:text-base">
+                            {selectedTicket.status}
+                          </span>
                           <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                         </motion.button>
                         <AnimatePresence>
@@ -352,13 +365,18 @@ export default function SupportDashboardPage() {
                               exit={{ opacity: 0, y: -10 }}
                               className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10"
                             >
-                              {['open', 'in-progress', 'resolved', 'escalated'].map((s) => (
+                              {[
+                                "open",
+                                "in-progress",
+                                "resolved",
+                                "escalated",
+                              ].map((s) => (
                                 <button
                                   key={s}
                                   onClick={() => {
                                     updateTicketStatus(
                                       selectedTicket.id,
-                                      s as SupportTicket['status']
+                                      s as SupportTicket["status"]
                                     );
                                     setIsStatusDropdownOpen(false);
                                   }}
@@ -386,39 +404,57 @@ export default function SupportDashboardPage() {
                         exit={{ opacity: 0, y: -20 }}
                         layout
                         className={`flex gap-2 sm:gap-3 md:gap-4 ${
-                          message.senderId === 'agent' ? 'justify-end' : 'justify-start'
+                          message.senderId === "agent"
+                            ? "justify-end"
+                            : "justify-start"
                         }`}
                       >
-                        {message.senderId !== 'agent' && (
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
-                            <User className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" />
-                          </div>
-                        )}
+                        {message.senderId !== "agent" &&
+                          (message.senderId === "bot" ? (
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                              <User className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 text-white" />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+                              <User className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" />
+                            </div>
+                          ))}
                         <motion.div
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 20,
+                          }}
                           className={`max-w-[85%] sm:max-w-[80%] md:max-w-[75%] lg:max-w-[70%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 ${
-                            message.senderId === 'agent'
-                              ? 'bg-indigo-600 text-white rounded-br-none'
-                              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md rounded-bl-none'
+                            message.senderId === "agent"
+                              ? "bg-indigo-600 text-white rounded-br-none"
+                              : message.senderId === "bot"
+                              ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md rounded-bl-none"
+                              : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md rounded-bl-none"
                           }`}
                         >
-                          <p className="whitespace-pre-wrap text-xs sm:text-sm md:text-base leading-relaxed">{message.text}</p>
+                          <p className="whitespace-pre-wrap text-xs sm:text-sm md:text-base leading-relaxed">
+                            {message.text}
+                          </p>
                           <p
                             className={`text-xs mt-1 ${
-                              message.senderId === 'agent'
-                                ? 'text-indigo-200'
-                                : 'text-gray-500 dark:text-gray-400'
+                              message.senderId === "agent"
+                                ? "text-indigo-200"
+                                : "text-gray-500 dark:text-gray-400"
                             }`}
                           >
-                            {new Date(message.timestamp).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
+                            {new Date(message.timestamp).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
                           </p>
                         </motion.div>
-                        {message.senderId === 'agent' && (
+                        {message.senderId === "agent" && (
                           <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
                             <User className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 text-white" />
                           </div>
@@ -455,7 +491,7 @@ export default function SupportDashboardPage() {
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                      onKeyPress={(e) => e.key === "Enter" && handleSend()}
                       placeholder="Type your message..."
                       className="flex-1 px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all text-sm md:text-base"
                     />
@@ -469,49 +505,16 @@ export default function SupportDashboardPage() {
                       <Send className="w-5 h-5 md:w-6 md:h-6" />
                     </motion.button>
                   </div>
-
-                  {/* Agent Notes */}
-                  <div className="mt-2 sm:mt-3 md:mt-4">
-                    <label className="block text-xs sm:text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
-                      Internal Notes
-                    </label>
-                    <div className="flex gap-2 sm:gap-3">
-                      <input
-                        type="text"
-                        value={noteInput}
-                        onChange={(e) => setNoteInput(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && noteInput.trim()) {
-                            addAgentNote(selectedTicket.id, noteInput);
-                            setNoteInput('');
-                          }
-                        }}
-                        placeholder="Add private notes (not visible to customer)"
-                        className="flex-1 px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all text-xs md:text-sm"
-                      />
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                          if (noteInput.trim()) {
-                            addAgentNote(selectedTicket.id, noteInput);
-                            setNoteInput('');
-                          }
-                        }}
-                        disabled={!noteInput.trim()}
-                        className="p-1 sm:p-2 md:p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                      >
-                        <FileText className="w-4 h-4 md:w-5 md:h-5" />
-                      </motion.button>
-                    </div>
-                  </div>
                 </div>
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
                 <div className="text-center">
                   <h2 className="text-2xl font-semibold">Select a Ticket</h2>
-                  <p className="mt-1 text-sm">Choose a ticket from the left panel to view the conversation.</p>
+                  <p className="mt-1 text-sm">
+                    Choose a ticket from the left panel to view the
+                    conversation.
+                  </p>
                 </div>
               </div>
             )}
@@ -521,4 +524,3 @@ export default function SupportDashboardPage() {
     </div>
   );
 }
-
