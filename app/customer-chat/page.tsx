@@ -6,7 +6,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/contexts/ChatContext";
 import { getTicketsByCustomerId } from "@/lib/storage";
-import { Send, LogOut, Bot, User, ArrowLeft, Paperclip } from "lucide-react";
+import {
+  Send,
+  LogOut,
+  Bot,
+  User,
+  ArrowLeft,
+  Paperclip,
+  Star,
+} from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
 
 export default function CustomerChatPage() {
@@ -18,12 +26,16 @@ export default function CustomerChatPage() {
     sendMessage,
     createTicket,
     loadCustomerTickets,
+    setSatisfaction,
   } = useChat();
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showSuggestions, setShowSuggestions] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState<number>(0);
+  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
     if (!user || user.role !== "customer") {
@@ -113,6 +125,20 @@ export default function CustomerChatPage() {
     router.push("/");
   };
 
+  const handleSubmitRating = () => {
+    if (!rating) return;
+    setSatisfaction(rating, feedback);
+    setShowRating(false);
+    // Start a fresh ticket for a new chat session
+    if (user) {
+      createTicket(user);
+      setInput("");
+      setShowSuggestions([]);
+      setRating(0);
+      setFeedback("");
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -157,6 +183,14 @@ export default function CustomerChatPage() {
               </p>
             </div>
             <ModeToggle />
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowRating(true)}
+              className="px-3 py-2 rounded-lg bg-indigo-50 dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 text-sm"
+            >
+              End Chat
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -334,6 +368,63 @@ export default function CustomerChatPage() {
               <div ref={messagesEndRef} />
             </div>
           </div>
+          {/* Rating overlay */}
+          {showRating && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div
+                className="absolute inset-0 bg-black/40"
+                onClick={() => setShowRating(false)}
+              />
+              <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200/60 dark:border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Rate your support experience
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  How satisfied are you with the help you received?
+                </p>
+                <div className="flex items-center gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setRating(s)}
+                      className={`p-2 rounded-full ${
+                        rating >= s ? "text-yellow-400" : "text-gray-400"
+                      }`}
+                      aria-label={`Rate ${s}`}
+                    >
+                      <Star
+                        className={`w-7 h-7 ${
+                          rating >= s ? "fill-yellow-400" : ""
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Optional feedback"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  rows={3}
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setShowRating(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitRating}
+                    disabled={!rating}
+                    className="px-4 py-2 rounded-lg bg-indigo-600 text-white disabled:opacity-50"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

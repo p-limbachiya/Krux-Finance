@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { SupportTicket, Message, User } from '@/types';
-import { getTickets, updateTicket, getTicketById } from '@/lib/storage';
+import { SupportTicket, Message } from '@/types';
+import { getTickets, updateTicket, getTicketById, addInternalNote as storageAddInternalNote, deleteInternalNote as storageDeleteInternalNote } from '@/lib/storage';
 
 interface SupportContextType {
   tickets: SupportTicket[];
@@ -11,7 +11,8 @@ interface SupportContextType {
   sendAgentMessage: (text: string) => void;
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
   updateTicketPriority: (ticketId: string, priority: SupportTicket['priority']) => void;
-  addAgentNote: (ticketId: string, note: string) => void;
+  addInternalNote: (ticketId: string, text: string, authorId: string, authorName: string) => void;
+  deleteInternalNote: (ticketId: string, noteId: string) => void;
   refreshTickets: () => void;
 }
 
@@ -98,8 +99,17 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
     }
   }, [selectedTicket, refreshTickets]);
 
-  const addAgentNote = useCallback((ticketId: string, note: string) => {
-    updateTicket(ticketId, { agentNotes: note });
+  const addInternalNote = useCallback((ticketId: string, text: string, authorId: string, authorName: string) => {
+    storageAddInternalNote(ticketId, { text, authorId, authorName });
+    refreshTickets();
+    if (selectedTicket?.id === ticketId) {
+      const updated = getTicketById(ticketId);
+      if (updated) setSelectedTicket(updated);
+    }
+  }, [selectedTicket, refreshTickets]);
+
+  const deleteInternalNote = useCallback((ticketId: string, noteId: string) => {
+    storageDeleteInternalNote(ticketId, noteId);
     refreshTickets();
     if (selectedTicket?.id === ticketId) {
       const updated = getTicketById(ticketId);
@@ -116,7 +126,8 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
         sendAgentMessage,
         updateTicketStatus,
         updateTicketPriority,
-        addAgentNote,
+        addInternalNote,
+        deleteInternalNote,
         refreshTickets,
       }}
     >

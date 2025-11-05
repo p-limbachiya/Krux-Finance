@@ -23,6 +23,7 @@ interface ChatContextType {
   createTicket: (customer: User) => SupportTicket;
   loadTicket: (ticketId: string) => void;
   loadCustomerTickets: (customerId: string) => void;
+  setSatisfaction: (score: number, feedback?: string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -138,6 +139,22 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     [messages, currentTicket]
   );
 
+  const setSatisfaction = useCallback(
+    (score: number, feedback?: string) => {
+      if (!currentTicket) return;
+      const updated = updateTicket(currentTicket.id, {
+        satisfactionScore: score,
+        satisfactionFeedback: feedback || "",
+        satisfactionAt: Date.now(),
+        status: "resolved",
+      });
+      if (updated) {
+        setCurrentTicket(updated);
+      }
+    },
+    [currentTicket]
+  );
+
   // Real-time sync: poll for updates written by agent dashboard
   useEffect(() => {
     if (!currentTicket) return;
@@ -166,6 +183,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         createTicket,
         loadTicket,
         loadCustomerTickets,
+        setSatisfaction,
       }}
     >
       {children}

@@ -18,6 +18,14 @@ export interface Message {
   isSystem?: boolean;
 }
 
+export interface InternalNote {
+  id: string;
+  text: string;
+  authorId: string;
+  authorName: string;
+  timestamp: number;
+}
+
 export interface SupportTicket {
   id: string;
   customerId: string;
@@ -27,11 +35,15 @@ export interface SupportTicket {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   category: 'loan-application' | 'document-requirements' | 'application-status' | 'general';
   messages: Message[];
+  notes?: InternalNote[];
   createdAt: number;
   updatedAt: number;
   assignedAgentId?: string;
   agentNotes?: string;
   responseTime?: number;
+  satisfactionScore?: number; // 1-5
+  satisfactionFeedback?: string;
+  satisfactionAt?: number;
 }
 
 export interface BotResponse {

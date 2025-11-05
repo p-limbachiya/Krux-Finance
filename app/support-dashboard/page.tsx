@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  Star,
 } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
 
@@ -33,6 +34,8 @@ export default function SupportDashboardPage() {
     sendAgentMessage,
     updateTicketStatus,
     updateTicketPriority,
+    addInternalNote,
+    deleteInternalNote,
   } = useSupport();
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +44,7 @@ export default function SupportDashboardPage() {
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [noteText, setNoteText] = useState("");
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -258,6 +262,13 @@ export default function SupportDashboardPage() {
                       <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 capitalize">
                         {ticket.priority}
                       </span>
+                      {typeof ticket.satisfactionScore === 'number' && (
+                        <span className="flex items-center gap-1 text-xs sm:text-sm text-yellow-500">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className={`w-3.5 h-3.5 ${i < (ticket.satisfactionScore || 0) ? 'fill-yellow-400' : ''}`} />
+                          ))}
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 break-words">
                       {ticket.messages[ticket.messages.length - 1]?.text ||
@@ -298,6 +309,18 @@ export default function SupportDashboardPage() {
                         <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 truncate">
                           {selectedTicket.customerPhone}
                         </p>
+                        {typeof selectedTicket.satisfactionScore === 'number' && (
+                          <div className="mt-1 flex items-center gap-1 text-yellow-500">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star key={i} className={`w-4 h-4 ${i < (selectedTicket.satisfactionScore || 0) ? 'fill-yellow-400' : ''}`} />
+                            ))}
+                            {selectedTicket.satisfactionFeedback && (
+                              <span className="ml-2 text-xs text-gray-600 dark:text-gray-400 truncate max-w-[280px]">
+                                “{selectedTicket.satisfactionFeedback}”
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
@@ -463,6 +486,83 @@ export default function SupportDashboardPage() {
                     ))}
                     <div ref={messagesEndRef} />
                   </AnimatePresence>
+                </div>
+
+                {/* Internal Notes - Glassmorphism */}
+                <div className="relative px-3 sm:px-4 md:px-6 py-4 border-t border-white/10">
+                  {/* floating accents */}
+                  <div className="pointer-events-none absolute inset-x-0 -top-6 flex justify-end pr-6 opacity-60">
+                    <motion.div
+                      initial={{ x: 20, y: 0, opacity: 0.4 }}
+                      animate={{ x: [20, 0, 10], y: [0, 4, 0], opacity: [0.4, 0.55, 0.4] }}
+                      transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+                      className="h-16 w-16 rounded-full bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 blur-xl"
+                    />
+                  </div>
+
+                  <div className="rounded-2xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-gray-900/20 backdrop-blur-xl shadow-lg p-3 sm:p-4">
+                    <div className="flex items-start gap-2">
+                      <textarea
+                        value={noteText}
+                        onChange={(e) => setNoteText(e.target.value)}
+                        placeholder="Add internal note (private)"
+                        className="flex-1 px-3 py-2 rounded-xl border border-white/30 dark:border-white/10 bg-white/60 dark:bg-gray-800/60 backdrop-blur placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition-all text-sm"
+                        rows={2}
+                      />
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          if (!noteText.trim() || !selectedTicket) return;
+                          addInternalNote(selectedTicket.id, noteText.trim(), user.id, user.name);
+                          setNoteText("");
+                        }}
+                        className="px-3 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                      >
+                        Save Note
+                      </motion.button>
+                    </div>
+
+                    <div className="mt-3 space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                      {selectedTicket?.notes?.length ? (
+                        selectedTicket.notes.slice().reverse().map((n) => (
+                          <motion.div
+                            key={n.id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="group relative rounded-xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md p-3 hover:shadow-lg hover:shadow-indigo-500/10 transition-shadow"
+                          >
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center text-[10px] font-semibold flex-shrink-0">
+                                  {n.authorName.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase()}
+                                </div>
+                                <span className="text-xs text-gray-700 dark:text-gray-300 truncate">
+                                  {n.authorName}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-white/10 text-gray-600 dark:text-gray-300">
+                                  {new Date(n.timestamp).toLocaleString()}
+                                </span>
+                                <button
+                                  onClick={() => deleteInternalNote(selectedTicket.id, n.id)}
+                                  className="opacity-70 hover:opacity-100 text-xs px-2 py-1 rounded-md bg-red-50/70 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-200/60 dark:border-red-800/40"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
+                              {n.text}
+                            </p>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">No internal notes yet.</div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Quick Replies */}

@@ -1,4 +1,4 @@
-import { User, SupportTicket, Message } from '@/types';
+import { User, SupportTicket, Message, InternalNote } from '@/types';
 
 const STORAGE_KEYS = {
   USERS: 'krux_users',
@@ -101,5 +101,31 @@ export const getTicketById = (ticketId: string): SupportTicket | null => {
 export const getTicketsByCustomerId = (customerId: string): SupportTicket[] => {
   const tickets = getTickets();
   return tickets.filter(t => t.customerId === customerId);
+};
+
+export const addInternalNote = (ticketId: string, note: Omit<InternalNote, 'id' | 'timestamp'>) => {
+  const tickets = getTickets();
+  const index = tickets.findIndex(t => t.id === ticketId);
+  if (index === -1) return null;
+  const newNote: InternalNote = {
+    id: `note-${Date.now()}`,
+    timestamp: Date.now(),
+    ...note,
+  };
+  const prevNotes = tickets[index].notes || [];
+  tickets[index] = { ...tickets[index], notes: [...prevNotes, newNote], updatedAt: Date.now() };
+  saveTickets(tickets);
+  return newNote;
+};
+
+export const deleteInternalNote = (ticketId: string, noteId: string) => {
+  const tickets = getTickets();
+  const index = tickets.findIndex(t => t.id === ticketId);
+  if (index === -1) return null;
+  const prevNotes = tickets[index].notes || [];
+  const nextNotes = prevNotes.filter(n => n.id !== noteId);
+  tickets[index] = { ...tickets[index], notes: nextNotes, updatedAt: Date.now() };
+  saveTickets(tickets);
+  return tickets[index];
 };
 
