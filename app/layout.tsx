@@ -6,6 +6,8 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { SupportProvider } from "@/contexts/SupportContext";
+import { WelcomeProvider } from "@/contexts/WelcomeContext";
+import WelcomeModalWrapper from "@/components/WelcomeModalWrapper";
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -44,7 +46,12 @@ export default function RootLayout({
         >
           <AuthProvider>
             <ChatProvider>
-              <SupportProvider>{children}</SupportProvider>
+              <SupportProvider>
+                <WelcomeProvider>
+                  <WelcomeModalWrapper />
+                  {children}
+                </WelcomeProvider>
+              </SupportProvider>
             </ChatProvider>
           </AuthProvider>
         </ThemeProvider>
