@@ -1,45 +1,47 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { useChat } from '@/contexts/ChatContext';
-import { getTicketsByCustomerId } from '@/lib/storage';
-import { Send, LogOut, Bot, User, ArrowLeft, Paperclip } from 'lucide-react';
-import { ModeToggle } from '@/components/theme-toggle';
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { useChat } from "@/contexts/ChatContext";
+import { getTicketsByCustomerId } from "@/lib/storage";
+import { Send, LogOut, Bot, User, ArrowLeft, Paperclip } from "lucide-react";
+import { ModeToggle } from "@/components/theme-toggle";
 
 export default function CustomerChatPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { messages, currentTicket, sendMessage, createTicket, loadCustomerTickets } = useChat();
-  const [input, setInput] = useState('');
+  const {
+    messages,
+    currentTicket,
+    sendMessage,
+    createTicket,
+    loadCustomerTickets,
+  } = useChat();
+  const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showSuggestions, setShowSuggestions] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!user || user.role !== 'customer') {
-      router.push('/');
+    if (!user || user.role !== "customer") {
+      router.push("/");
       return;
     }
 
-    if (!currentTicket) {
-      // Check if user has existing tickets
-      const existingTickets = getTicketsByCustomerId(user.id);
-      if (existingTickets.length > 0) {
-        // Load the most recent ticket
-        loadCustomerTickets(user.id);
-      } else {
-        // Create a new ticket
-        createTicket(user);
-      }
+    // Always scope chat to the current customer, even if a previous ticket exists in memory
+    const existingTickets = getTicketsByCustomerId(user.id);
+    if (existingTickets.length > 0) {
+      loadCustomerTickets(user.id);
+    } else {
+      createTicket(user);
     }
-  }, [user, router, currentTicket, createTicket, loadCustomerTickets]);
+  }, [user?.id, user?.role, router, createTicket, loadCustomerTickets]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   useEffect(() => {
@@ -55,24 +57,24 @@ export default function CustomerChatPage() {
   const extractSuggestions = (text: string): string[] => {
     // Extract suggestions from bot response text
     const commonSuggestions = [
-      'Loan Application',
-      'Document Help',
-      'Check Status',
-      'Talk to Agent',
-      'Start Application',
-      'Upload Documents',
-      'Business Loan',
-      'Personal Loan',
-      'MSME Loan',
-      'Document Requirements',
-      'Enter Application ID',
+      "Loan Application",
+      "Document Help",
+      "Check Status",
+      "Talk to Agent",
+      "Start Application",
+      "Upload Documents",
+      "Business Loan",
+      "Personal Loan",
+      "MSME Loan",
+      "Document Requirements",
+      "Enter Application ID",
     ];
-    
+
     // Check if any suggestions are mentioned in the text
-    const found = commonSuggestions.filter(s => 
+    const found = commonSuggestions.filter((s) =>
       text.toLowerCase().includes(s.toLowerCase())
     );
-    
+
     // If no suggestions found, return default ones
     return found.length > 0 ? found.slice(0, 4) : [];
   };
@@ -81,7 +83,7 @@ export default function CustomerChatPage() {
     if (!input.trim()) return;
 
     sendMessage(input);
-    setInput('');
+    setInput("");
     setShowSuggestions([]);
     setIsTyping(true);
 
@@ -108,7 +110,7 @@ export default function CustomerChatPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    router.push("/");
   };
 
   if (!user) return null;
@@ -126,25 +128,33 @@ export default function CustomerChatPage() {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => router.push('/')}
+              onClick={() => router.push("/")}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </motion.button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
                 <Bot className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="font-semibold text-gray-900 dark:text-white">KRUX Support</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">We're here to help</p>
+                <h1 className="font-semibold text-gray-900 dark:text-white">
+                  KRUX Support
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  We're here to help
+                </p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{user.phone}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {user.name}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {user.phone}
+              </p>
             </div>
             <ModeToggle />
             <motion.button
@@ -159,97 +169,171 @@ export default function CustomerChatPage() {
         </div>
       </motion.div>
 
-      {/* Messages */}
+      {/* Messages (Glassmorphism Card with floating balls behind) */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {messages.length === 0 && (
+        <div className="relative max-w-4xl mx-auto">
+          {/* Floating balls background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-12"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center"
-              >
-                <Bot className="w-10 h-10 text-white" />
-              </motion.div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                Welcome to KRUX Finance Support!
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-                How can we help you today? Ask a question or choose one of the options below.
-              </p>
-            </motion.div>
-          )}
+              initial={{ x: -80, y: -40, opacity: 0.5 }}
+              animate={{
+                x: [-80, 40, -60],
+                y: [-40, -20, -40],
+                opacity: [0.5, 0.6, 0.5],
+              }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+              className="w-56 h-56 bg-linear-to-br from-indigo-500/40 to-purple-500/40 rounded-full blur-3xl"
+            />
+            <motion.div
+              initial={{ x: 120, y: 60, opacity: 0.4 }}
+              animate={{
+                x: [120, 10, 120],
+                y: [60, 100, 60],
+                opacity: [0.4, 0.55, 0.4],
+              }}
+              transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+              className="w-64 h-64 bg-linear-to-br from-fuchsia-500/40 to-cyan-500/40 rounded-full blur-3xl"
+            />
+          </div>
 
-          <AnimatePresence>
-            {messages.map((message, index) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: message.isBot ? -20 : 20 }}
-                transition={{ delay: index * 0.1 }}
-                className={`flex gap-3 w-full ${message.isBot ? 'justify-start' : 'justify-end'}`}
-              >
-                {message.isBot && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0 self-end mb-2">
+          {/* Glass card */}
+          <div className="rounded-3xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl shadow-xl p-4 sm:p-6">
+            <div className="space-y-6">
+              {messages.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-12"
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-20 h-20 mx-auto mb-4 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center"
+                  >
+                    <Bot className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Welcome to KRUX Finance Support!
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                    How can we help you today? Ask a question or choose one of
+                    the options below.
+                  </p>
+                </motion.div>
+              )}
+
+              <AnimatePresence>
+                {messages.map((message, index) => {
+                  const isSelf = message.senderId === user.id;
+                  const isSupport = !isSelf; // bot or agent messages
+                  const showBot = message.isBot === true;
+                  return (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{
+                        opacity: 0,
+                        x: isSelf ? 20 : -20,
+                      }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`flex gap-3 w-full ${
+                        isSelf ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {isSupport && (
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 self-end mb-2 ${
+                            showBot
+                              ? "bg-linear-to-br from-indigo-500 to-purple-500"
+                              : "bg-gray-300 dark:bg-gray-600"
+                          }`}
+                        >
+                          {showBot ? (
+                            <Bot className="w-5 h-5 text-white" />
+                          ) : (
+                            <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                          )}
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
+                          isSelf
+                            ? "bg-indigo-600 text-white rounded-br-none"
+                            : "bg-white/70 dark:bg-gray-800/70 backdrop-blur text-gray-900 dark:text-white shadow-md rounded-bl-none"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          {!isSelf ? (
+                            <span className="text-[11px] tracking-wide uppercase text-gray-500 dark:text-gray-400">
+                              Customer Care
+                            </span>
+                          ) : (
+                            <span className="text-[11px] tracking-wide uppercase text-indigo-200">
+                              You
+                            </span>
+                          )}
+                        </div>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {message.text}
+                        </p>
+                        <p
+                          className={`text-xs mt-2 text-right ${
+                            isSelf
+                              ? "text-indigo-200"
+                              : "text-gray-500 dark:text-gray-400"
+                          }`}
+                        >
+                          {new Date(message.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                      {isSelf && (
+                        <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 self-end mb-2">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex gap-3"
+                >
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center self-end mb-2">
                     <Bot className="w-5 h-5 text-white" />
                   </div>
-                )}
-                <div
-                  className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
-                    message.isBot
-                      ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md rounded-bl-none'
-                      : 'bg-indigo-600 text-white rounded-br-none'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.text}</p>
-                  <p className={`text-xs mt-2 text-right ${message.isBot ? 'text-gray-500 dark:text-gray-400' : 'text-indigo-200'}`}>
-                    {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-                {!message.isBot && (
-                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0 self-end mb-2">
-                    <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md rounded-bl-none">
+                    <div className="flex gap-1 items-center">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">
+                        KRUX is typing
+                      </span>
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-2 h-2 bg-gray-400 rounded-full"
+                          animate={{ y: [0, -8, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.2,
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                )}
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                </motion.div>
+              )}
 
-          {isTyping && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-3"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center self-end mb-2">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md rounded-bl-none">
-                <div className="flex gap-1 items-center">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">KRUX is typing</span>
-                  {[0, 1, 2].map((i) => (
-                    <motion.div
-                      key={i}
-                      className="w-2 h-2 bg-gray-400 rounded-full"
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{
-                        duration: 0.6,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -298,7 +382,7 @@ export default function CustomerChatPage() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            onKeyPress={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type your message..."
             className="flex-1 px-4 py-3 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all"
           />
@@ -316,5 +400,4 @@ export default function CustomerChatPage() {
     </div>
   );
 }
-""
-
+("");

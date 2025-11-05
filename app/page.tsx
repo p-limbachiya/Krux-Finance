@@ -7,7 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { ModeToggle } from "@/components/theme-toggle";
-import { MessageCircle, Users, ArrowRight, Shield, Building2 } from "lucide-react";
+import {
+  MessageCircle,
+  Users,
+  ArrowRight,
+  Shield,
+  Building2,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 const loginSchema = z.object({
@@ -50,9 +56,37 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="relative min-h-screen bg-background font-sans overflow-hidden">
+      {/* Floating abstract gradient ball background */}
+      <motion.div
+        aria-hidden
+        initial={{ scale: 0.9, opacity: 0.6, x: 0, y: 0 }}
+        animate={{
+          scale: [0.9, 1.05, 0.95, 1],
+          x: [0, 20, -10, 0],
+          y: [0, -10, 10, 0],
+          opacity: [0.5, 0.6, 0.55, 0.6],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -top-24 -right-24 h-[420px] w-[420px] sm:h-[520px] sm:w-[520px] rounded-full bg-gradient-to-br from-niagara to-royal-blue blur-3xl opacity-40 dark:opacity-30"
+      />
+      <motion.div
+        aria-hidden
+        initial={{ scale: 0.95, opacity: 0.5 }}
+        animate={{
+          scale: [0.95, 1.03, 0.98, 1],
+          opacity: [0.45, 0.55, 0.5, 0.55],
+        }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 4,
+        }}
+        className="pointer-events-none absolute -bottom-32 -left-32 h-[520px] w-[520px] sm:h-[640px] sm:w-[640px] rounded-full bg-gradient-to-tr from-royal-blue to-niagara blur-3xl opacity-40 dark:opacity-25"
+      />
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 p-4 sm:p-6">
+      <header className="absolute top-0 left-0 right-0 p-4 sm:p-6 z-10">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2 sm:gap-3">
             <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
@@ -65,7 +99,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-12 pt-20 sm:pt-24">
+      <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 py-12 pt-20 sm:pt-24">
         <div className="w-full max-w-4xl mx-4">
           {/* Welcome Section */}
           <motion.div
@@ -92,19 +126,25 @@ export default function Home() {
             {/* Customer Card */}
             <div
               onClick={() => setIsCustomer(true)}
-              className={`p-6 sm:p-8 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+              className={`p-6 sm:p-8 rounded-xl border-2 cursor-pointer transition-all duration-300 backdrop-blur-md bg-white/60 dark:bg-white/5 shadow-xl ${
                 isCustomer
-                  ? "border-primary bg-card shadow-lg"
-                  : "border-border bg-card/50 hover:bg-card"
+                  ? "border-primary"
+                  : "border-border hover:bg-white/70 dark:hover:bg-white/10"
               }`}
             >
               <div className="flex items-center gap-3 sm:gap-4 mb-4">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
-                  isCustomer ? "bg-primary" : "bg-muted"
-                }`}>
-                  <MessageCircle className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                    isCustomer ? "text-primary-foreground" : "text-muted-foreground"
-                  }`} />
+                <div
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
+                    isCustomer ? "bg-primary" : "bg-muted"
+                  }`}
+                >
+                  <MessageCircle
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
+                      isCustomer
+                        ? "text-primary-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  />
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-xl font-semibold text-card-foreground">
@@ -120,19 +160,25 @@ export default function Home() {
             {/* Support Agent Card */}
             <div
               onClick={() => setIsCustomer(false)}
-              className={`p-6 sm:p-8 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+              className={`p-6 sm:p-8 rounded-xl border-2 cursor-pointer transition-all duration-300 backdrop-blur-md bg-white/60 dark:bg-white/5 shadow-xl ${
                 !isCustomer
-                  ? "border-accent bg-card shadow-lg"
-                  : "border-border bg-card/50 hover:bg-card"
+                  ? "border-accent"
+                  : "border-border hover:bg-white/70 dark:hover:bg-white/10"
               }`}
             >
               <div className="flex items-center gap-3 sm:gap-4 mb-4">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
-                  !isCustomer ? "bg-accent" : "bg-muted"
-                }`}>
-                  <Shield className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                    !isCustomer ? "text-accent-foreground" : "text-muted-foreground"
-                  }`} />
+                <div
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
+                    !isCustomer ? "bg-accent" : "bg-muted"
+                  }`}
+                >
+                  <Shield
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
+                      !isCustomer
+                        ? "text-accent-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  />
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-xl font-semibold text-card-foreground">
@@ -151,9 +197,17 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-card rounded-xl shadow-lg p-6 sm:p-8 border border-border"
+            className="relative rounded-xl p-6 sm:p-8 border border-white/30 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-2xl"
           >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+            {/* subtle glass shine overlay */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent dark:from-white/10"
+            />
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4 sm:space-y-6 relative z-10"
+            >
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
                   {isCustomer ? "Phone Number" : "Username"}
@@ -161,12 +215,8 @@ export default function Home() {
                 <input
                   type="text"
                   {...register("identifier")}
-                  placeholder={
-                    isCustomer
-                      ? "+919876543210"
-                      : "amit.kumar"
-                  }
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-ring focus:border-ring focus:outline-none transition-all text-sm sm:text-base"
+                  placeholder={isCustomer ? "+919876543210" : "amit.kumar"}
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-white/40 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground focus:ring-2 focus:ring-ring focus:border-ring focus:outline-none transition-all text-sm sm:text-base backdrop-blur"
                 />
                 {errors.identifier && (
                   <p className="mt-2 text-sm text-destructive">
@@ -174,9 +224,7 @@ export default function Home() {
                   </p>
                 )}
                 {error && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {error}
-                  </p>
+                  <p className="mt-2 text-sm text-destructive">{error}</p>
                 )}
               </div>
 
@@ -197,7 +245,7 @@ export default function Home() {
             </form>
 
             {/* Demo Credentials */}
-            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-muted rounded-lg">
+            <div className="relative z-10 mt-4 sm:mt-6 p-3 sm:p-4 bg-white/60 dark:bg-white/5 border border-white/30 dark:border-white/10 backdrop-blur rounded-lg">
               <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1 sm:mb-2">
                 Demo Credentials:
               </p>
@@ -218,9 +266,10 @@ export default function Home() {
           </motion.div>
 
           {/* Footer */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-12 relative z-10">
             <p className="text-sm text-slate-500 dark:text-slate-500">
-              By logging in, you agree to our terms of service and privacy policy
+              By logging in, you agree to our terms of service and privacy
+              policy
             </p>
           </div>
         </div>
