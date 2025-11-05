@@ -102,7 +102,7 @@ export default function AboutPage() {
             <div className="flex items-center mb-6">
               <Settings className="w-6 h-6 text-blue-600 mr-3" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                ⚙️ Core Features
+                 Core Features
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
@@ -120,7 +120,7 @@ export default function AboutPage() {
             <div className="flex items-center mb-6">
               <Sparkles className="w-6 h-6 text-purple-600 mr-3" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                ✨ Extra Feature
+                 Extra Feature
               </h2>
             </div>
             <div className="space-y-3">
@@ -138,7 +138,7 @@ export default function AboutPage() {
             <div className="flex items-center mb-6">
               <Gift className="w-6 h-6 text-pink-600 mr-3" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                🎁 Bonus Features
+                 Bonus Features
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
@@ -158,7 +158,7 @@ export default function AboutPage() {
               <div className="flex items-center mb-6">
                 <Construction className="w-6 h-6 text-orange-600 mr-3" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  🚧 In Progress
+                   In Progress
                 </h2>
               </div>
               <div className="space-y-3">
@@ -176,7 +176,7 @@ export default function AboutPage() {
               <div className="flex items-center mb-6">
                 <Telescope className="w-6 h-6 text-indigo-600 mr-3" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  🔮 Planned Next
+                   Planned Next
                 </h2>
               </div>
               <div className="space-y-3">
