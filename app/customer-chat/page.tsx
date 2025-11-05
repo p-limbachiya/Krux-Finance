@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChat } from '@/contexts/ChatContext';
 import { getTicketsByCustomerId } from '@/lib/storage';
-import { Send, LogOut, Bot, User, ArrowLeft } from 'lucide-react';
+import { Send, LogOut, Bot, User, ArrowLeft, Paperclip } from 'lucide-react';
+import { ModeToggle } from '@/components/theme-toggle';
 
 export default function CustomerChatPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function CustomerChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showSuggestions, setShowSuggestions] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user || user.role !== 'customer') {
@@ -93,6 +95,17 @@ export default function CustomerChatPage() {
     setShowSuggestions([]);
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      sendMessage(`I have uploaded a document: ${file.name}`);
+    }
+  };
+
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleLogout = () => {
     logout();
     router.push('/');
@@ -133,6 +146,7 @@ export default function CustomerChatPage() {
               <p className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">{user.phone}</p>
             </div>
+            <ModeToggle />
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -147,7 +161,7 @@ export default function CustomerChatPage() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto space-y-4">
+        <div className="max-w-4xl mx-auto space-y-6">
           {messages.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -161,11 +175,11 @@ export default function CustomerChatPage() {
               >
                 <Bot className="w-10 h-10 text-white" />
               </motion.div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-2">
                 Welcome to KRUX Finance Support!
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                How can we help you today?
+              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                How can we help you today? Ask a question or choose one of the options below.
               </p>
             </motion.div>
           )}
@@ -178,27 +192,27 @@ export default function CustomerChatPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: message.isBot ? -20 : 20 }}
                 transition={{ delay: index * 0.1 }}
-                className={`flex gap-3 ${message.isBot ? 'justify-start' : 'justify-end'}`}
+                className={`flex gap-3 w-full ${message.isBot ? 'justify-start' : 'justify-end'}`}
               >
                 {message.isBot && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0 self-end mb-2">
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                  className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
                     message.isBot
-                      ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md'
-                      : 'bg-indigo-600 text-white'
+                      ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md rounded-bl-none'
+                      : 'bg-indigo-600 text-white rounded-br-none'
                   }`}
                 >
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.text}</p>
-                  <p className={`text-xs mt-2 ${message.isBot ? 'text-gray-500 dark:text-gray-400' : 'text-indigo-200'}`}>
+                  <p className={`text-xs mt-2 text-right ${message.isBot ? 'text-gray-500 dark:text-gray-400' : 'text-indigo-200'}`}>
                     {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 {!message.isBot && (
-                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0 self-end mb-2">
                     <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </div>
                 )}
@@ -212,11 +226,12 @@ export default function CustomerChatPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex gap-3"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center self-end mb-2">
                 <Bot className="w-5 h-5 text-white" />
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md">
-                <div className="flex gap-1">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md rounded-bl-none">
+                <div className="flex gap-1 items-center">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">KRUX is typing</span>
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
@@ -245,7 +260,7 @@ export default function CustomerChatPage() {
           animate={{ opacity: 1, y: 0 }}
           className="px-4 pb-2"
         >
-          <div className="max-w-4xl mx-auto flex flex-wrap gap-2">
+          <div className="max-w-4xl mx-auto flex flex-wrap gap-2 justify-center sm:justify-start">
             {showSuggestions.map((suggestion) => (
               <motion.button
                 key={suggestion}
@@ -263,7 +278,21 @@ export default function CustomerChatPage() {
 
       {/* Input */}
       <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
-        <div className="max-w-4xl mx-auto flex gap-2">
+        <div className="max-w-4xl mx-auto flex gap-2 items-center">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleAttachmentClick}
+            className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+          >
+            <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </motion.button>
           <motion.input
             whileFocus={{ scale: 1.02 }}
             type="text"
@@ -271,14 +300,14 @@ export default function CustomerChatPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all"
+            className="flex-1 px-4 py-3 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSend}
             disabled={!input.trim()}
-            className="p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-5 h-5" />
           </motion.button>
@@ -287,4 +316,5 @@ export default function CustomerChatPage() {
     </div>
   );
 }
+""
 
