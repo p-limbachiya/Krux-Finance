@@ -89,6 +89,26 @@ export default function AboutPage() {
           </p>
         </motion.div>
 
+        {/* Demo Video Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg mb-12 text-center"
+        >
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            Project Demo Video
+          </h2>
+          <div className="flex justify-center">
+            <video
+              controls
+              className="rounded-xl shadow-lg w-full max-w-3xl border border-gray-300 dark:border-gray-700"
+            >
+              <source src="/videos/Intro.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </motion.div>
 
         {/* Feature Lists Section */}
         <motion.div
