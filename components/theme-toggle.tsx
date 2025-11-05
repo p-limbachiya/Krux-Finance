@@ -24,14 +24,14 @@ export function ModeToggle() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-card border-border">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="text-foreground hover:bg-secondary focus:bg-secondary">
+      <DropdownMenuContent align="end" className="bg-card hover:text-black  border-border">
+        <DropdownMenuItem onClick={() => setTheme("light")} className="text-foreground hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white focus:bg-gray-300 dark:focus:bg-gray-600 transition-colors">
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="text-foreground hover:bg-secondary focus:bg-secondary">
+        <DropdownMenuItem onClick={() => setTheme("dark")} className="text-foreground hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white focus:bg-gray-300 dark:focus:bg-gray-600 transition-colors">
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="text-foreground hover:bg-secondary focus:bg-secondary">
+        <DropdownMenuItem onClick={() => setTheme("system")} className="text-foreground hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white focus:bg-gray-300 dark:focus:bg-gray-600 transition-colors">
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
